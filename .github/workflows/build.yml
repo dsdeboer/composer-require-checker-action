@@ -19,17 +19,18 @@ on:
                 required: true
                 default: 'null'
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
 jobs:
     build:
         name: Build
         runs-on: ubuntu-latest
 
         steps:
-
             -   uses: docker/setup-qemu-action@v3
-
             -   uses: actions/checkout@v4
-
             -   uses: docker/login-action@v3
                 with:
                     registry: ghcr.io
@@ -59,8 +60,8 @@ jobs:
                     docker buildx build \
                       --progress plain \
                       --platform=linux/amd64,linux/arm64 \
-                      --cache-from=ghcr.io/webfactory/composer-require-checker:build-cache \
-                      --cache-to=type=registry,ref=ghcr.io/webfactory/composer-require-checker:build-cache,mode=max,push=true \
+                      --cache-from=ghcr.io/dsdeboer/composer-require-checker:build-cache \
+                      --cache-to=type=registry,ref=ghcr.io/dsdeboer/composer-require-checker:build-cache,mode=max,push=true \
                       --pull \
                       --build-arg VERSION="$COMPOSER_REQUIRE_CHECKER_VERSION" \
                       .
@@ -70,7 +71,7 @@ jobs:
                     # Load image for current platform into local Docker (see https://github.com/docker/buildx/issues/59)
                     docker buildx build \
                       --progress plain \
-                      --cache-from=ghcr.io/webfactory/composer-require-checker:build-cache \
+                      --cache-from=ghcr.io/dsdeboer/composer-require-checker:build-cache \
                       --tag build \
                       --build-arg VERSION="$COMPOSER_REQUIRE_CHECKER_VERSION" \
                       --load .
@@ -84,8 +85,8 @@ jobs:
                     docker buildx build \
                       --progress plain \
                       --platform=linux/amd64,linux/arm64 \
-                      --cache-from=ghcr.io/webfactory/composer-require-checker:build-cache \
-                      --tag ghcr.io/webfactory/composer-require-checker:"$COMPOSER_REQUIRE_CHECKER_VERSION" \
-                      --label org.opencontainers.image.source=https://github.com/webfactory/docker-composer-require-checker \
+                      --cache-from=ghcr.io/dsdeboer/composer-require-checker:build-cache \
+                      --tag ghcr.io/dsdeboer/composer-require-checker:"$COMPOSER_REQUIRE_CHECKER_VERSION" \
+                      --label org.opencontainers.image.source=https://github.com/dsdeboer/composer-require-checker-action \
                       --build-arg VERSION="$COMPOSER_REQUIRE_CHECKER_VERSION" \
                       --push .

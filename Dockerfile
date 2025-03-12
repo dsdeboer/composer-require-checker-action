@@ -1,13 +1,15 @@
-FROM php:8-cli as base
-RUN apt-get update && apt-get install -y libzip4
+FROM php:8-cli-alpine AS base
+RUN set -eux \
+    && apk add --no-cache libzip
 
-FROM base as build_extensions
+FROM base AS build_extensions
 
-RUN apt-get update && apt-get install -y libzip-dev libicu-dev \
+RUN set -eux \
+    && apk add --no-cache libzip-dev icu-libs icu-dev libintl gettext-dev \
     && docker-php-ext-install gettext zip intl \
     && docker-php-ext-enable gettext zip intl
 
-FROM composer:2 as staging
+FROM composer:2 AS staging
 
 RUN apk --no-cache add git
 
@@ -31,11 +33,11 @@ WORKDIR /app
 ENTRYPOINT ["/composer-require-checker/bin/composer-require-checker"]
 CMD ["check"]
 
-LABEL "com.github.actions.name"="webfactory-composer-require-checker"
+LABEL "com.github.actions.name"="dsdeboer-composer-require-checker"
 LABEL "com.github.actions.description"="Analyze composer dependencies and verify that no unknown symbols are used in the sources of a package"
 LABEL "com.github.actions.icon"="check"
 LABEL "com.github.actions.color"="blue"
 
-LABEL "repository"="https://github.com/webfactory/docker-composer-require-checker"
+LABEL "repository"="https://github.com/dsdeboer/composer-require-checker-action"
 LABEL "homepage"="https://github.com/maglnet/ComposerRequireChecker"
-LABEL "maintainer"="webfactory GmbH <info@webfactory.de>"
+LABEL "maintainer"="dsdeboer GmbH <info@dsdeboer.de>"
