@@ -1,6 +1,15 @@
 name: 'ComposerRequireChecker action'
 description: 'Checks the usage of composer dependencies'
 
+inputs:
+    working-dir:
+        description: 'Working directory'
+        required: false
+        default: '.'
+
 runs:
   using: 'docker'
   image: "docker://ghcr.io/dsdeboer/composer-require-checker:4.16.1"
+  entrypoint: '/entrypoint.sh'
+  args:
+    - "${{ inputs.working-dir }}"
