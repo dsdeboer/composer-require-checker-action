@@ -1,11 +1,11 @@
 FROM php:8-cli-alpine AS base
 RUN set -eux \
-    && apk add --no-cache libzip
+    && apk add --no-cache libzip icu-libs libintl gettext
 
 FROM base AS build_extensions
 
 RUN set -eux \
-    && apk add --no-cache libzip-dev icu-libs icu-dev libintl gettext gettext-dev \
+    && apk add --no-cache libzip-dev icu-libs icu-dev gettext-dev \
     && docker-php-ext-install gettext zip intl \
     && docker-php-ext-enable gettext zip intl
 
@@ -30,8 +30,8 @@ COPY memory.ini /usr/local/etc/php/conf.d/memory.ini
 
 RUN mkdir /app
 WORKDIR /app
-ENTRYPOINT ["/composer-require-checker/bin/composer-require-checker"]
-CMD ["check"]
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 
 LABEL "com.github.actions.name"="dsdeboer-composer-require-checker"
 LABEL "com.github.actions.description"="Analyze composer dependencies and verify that no unknown symbols are used in the sources of a package"
@@ -40,4 +40,4 @@ LABEL "com.github.actions.color"="blue"
 
 LABEL "repository"="https://github.com/dsdeboer/composer-require-checker-action"
 LABEL "homepage"="https://github.com/maglnet/ComposerRequireChecker"
-LABEL "maintainer"="dsdeboer GmbH <info@dsdeboer.de>"
+LABEL "maintainer"="Duncan de Boer <info@dsdeboer.nl>"
