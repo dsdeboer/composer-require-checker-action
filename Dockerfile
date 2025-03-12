@@ -5,7 +5,7 @@ RUN set -eux \
 FROM base AS build_extensions
 
 RUN set -eux \
-    && apk add --no-cache libzip-dev icu-libs icu-dev libintl gettext-dev \
+    && apk add --no-cache libzip-dev icu-libs icu-dev libintl gettext gettext-dev \
     && docker-php-ext-install gettext zip intl \
     && docker-php-ext-enable gettext zip intl
 

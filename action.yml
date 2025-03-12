@@ -1,0 +1,6 @@
+name: 'ComposerRequireChecker action'
+description: 'Checks the usage of composer dependencies'
+
+runs:
+  using: 'docker'
+  image: "docker://ghcr.io/dsdeboer/composer-require-checker:4.16.1"
